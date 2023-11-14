@@ -9,8 +9,8 @@ configuration
 from machine import Pin, SPI
 import utime
 import framebuf
-import Matrix8x8Rect.py
-import Framebuf_Gallery.py
+from Framebuf_Gallery import icons8, icons16, icons32
+from Matrix8x8Rect import Matrix8x8Rect
 
 p25LED = machine.Pin(25,machine.Pin.OUT)
 
@@ -27,7 +27,7 @@ for i in range(2):
 # VNUM = No of 8x8 matrix block present vertically
 
 HNUM = 8
-VNUM = 2
+VNUM = 4
 
 pMOSI = machine.Pin(3)
 pCLK = machine.Pin(2)
@@ -37,9 +37,11 @@ display = Matrix8x8Rect(SPI(0,sck=pCLK,mosi=pMOSI), pCS, HNUM, VNUM)
 display.brightness(2)
 
 mess01 = "Happy Diwali"
-mess02 = "Shubh Labh"
+mess02 = " Shubh Labh"
+mess03 = "   Jai Hanuman"
+mess04 = "Kshitij Goel"
 
-max_h_scroll = (len(mess01) + len(mess02)) * 8
+max_h_scroll = max(len(mess01), len(mess02), len(mess03),len(mess04)) * 8
 max_v_scroll = display.MH * VNUM + 1
 
 while True:
@@ -53,23 +55,36 @@ while True:
              display.blit(img,x + i*16,0)
          display.show()
          utime.sleep(0.05)
-    
-    # Horizontal Scrolling for all icons in 8x8 list in alternate rows
-    for x in range(HNUM*display.MW, -(len(icons8)+1)*8, -1):
+
+    # Horizontal Scrolling for all icons in 32x32 list 
+    for x in range(HNUM*display.MW, -(len(icons32)+1)*32, -1):
          display.fill(0)
          i = 0
-         for name in icons8:
-             img = framebuf.FrameBuffer(bytearray(icons8[name]), 8, 8, framebuf.MONO_HLSB)
+         for name in icons32:
+             img = framebuf.FrameBuffer(bytearray(icons32[name]), 32, 32, framebuf.MONO_HLSB)
              i = i + 1
-             display.blit(img,x + i*9,(i%2)*8)
+             display.blit(img,x + i*32,0)
          display.show()
          utime.sleep(0.05)
 
-    # Horizontal Scrolling for text
+#     # Horizontal Scrolling for all icons in 8x8 list in alternate rows
+#     for x in range(HNUM*display.MW, -(len(icons8)+1)*8, -1):
+#          display.fill(0)
+#          i = 0
+#          for name in icons8:
+#              img = framebuf.FrameBuffer(bytearray(icons8[name]), 8, 8, framebuf.MONO_HLSB)
+#              i = i + 1
+#              display.blit(img,x + i*9,(i%2)*8)
+#          display.show()
+#          utime.sleep(0.05)
+
+    # Horizontal Scrolling for tex
     for x in range(HNUM*display.MW, -max_h_scroll, -1):
         display.fill(0)
         display.text(mess01,x + 8,display.MH * 0,1)
-        display.text(mess02,x + (len(mess01) + 1)*8, display.MH * 1,1)
+        display.text(mess02,x + 8, display.MH * 1,1)
+        display.text(mess03,x + 8, display.MH * 2,1)
+        display.text(mess04,x + 8, display.MH * 3,1)
         display.show()
         utime.sleep(0.05)
 
